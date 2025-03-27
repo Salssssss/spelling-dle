@@ -4,7 +4,7 @@ import React from 'react';
 const VoiceSelector = ({ voices, selectedVoice, setSelectedVoice }) => {
   return (
     <div className="voice-select">
-      <label htmlFor="voiceSelect">Select Word Voice:</label>
+      <label htmlFor="voiceSelect">Select Voice:</label>
       <select
         id="voiceSelect"
         value={selectedVoice?.name || ''}

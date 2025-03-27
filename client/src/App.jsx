@@ -187,70 +187,87 @@ const App = () => {
 
         {currentWord ? (
           <>
-            <p className="definition">“{currentWord.definition}”</p>
-            <SentenceSpeaker
-              sentence={currentWord.sentence}
-              word={currentWord.word}
-              primaryVoice={selectedVoice}      // Mark
-              alternateVoice={alternateVoice}   // Zira/Female
-            />
+            {correct === null && (
+              <>
+                <p className="definition">“{currentWord.definition}”</p>
+                <SentenceSpeaker
+                  sentence={currentWord.sentence}
+                  word={currentWord.word}
+                  primaryVoice={selectedVoice}
+                  alternateVoice={alternateVoice}
+                />
 
-            <input
-              className="text-input"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  showNext ? handleNext() : handleSubmit();
-                }
-              }}              
-              placeholder="Type your spelling..."
-              ref={inputRef}
-              spellCheck={false}
-            />
-            <div className="button-group">
-              <button className="submit" onClick={handleSubmit}>Submit</button>
-              <button className="audio" onClick={() => speak(currentWord.word)}>🔊 Hear Word</button>
-            </div>
-            <VoiceSelector
-              voices={voices}
-              selectedVoice={selectedVoice}
-              setSelectedVoice={setSelectedVoice}
-            />
-            {letterResults.length > 0 && (
-              <div className="letter-feedback-rows">
-                <div className="letter-row">
-                  {currentWord.word.split('').map((char, i) => (
-                    <span
-                      key={`user-${i}`}
-                      className={`letter-box ${letterResults[i]}`}
-                    >
-                      {input[i] || '_'}
-                    </span>
-                  ))}
+                <input
+                  className="text-input"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSubmit();
+                  }}
+                  placeholder="Type your spelling..."
+                  ref={inputRef}
+                  spellCheck={false}
+                />
+
+                <div className="button-group">
+                  <button className="submit" onClick={handleSubmit}>Submit</button>
+                  <button className="audio" onClick={() => speak(currentWord.word)}>🔊 Hear Word</button>
                 </div>
 
-                {correct === false && (
-                  <div className="letter-row correct-row">
-                    {currentWord.word.split('').map((char, i) => (
-                      <span
-                        key={`correct-${i}`}
-                        className="letter-box correct"
-                      >
-                        {char}
-                      </span>
-                    ))}
-                  </div>
-                )}
+                <VoiceSelector
+                  voices={voices}
+                  selectedVoice={selectedVoice}
+                  setSelectedVoice={setSelectedVoice}
+                />
+              </>
+            )}
+            {letterResults.length > 0 && (
+              <div className="letter-feedback-rows">
+                {(() => {
+                  const correctLetters = currentWord.word.split('');
+                  const userLetters = input.split('');
+                  const maxLen = Math.max(correctLetters.length, userLetters.length);
+
+                  return (
+                    <>
+                      {/* User's answer row */}
+                      <div className="letter-row">
+                        {Array.from({ length: maxLen }).map((_, i) => {
+                          const char = userLetters[i] || '';
+                          const feedback = correctLetters[i] && char.toLowerCase() === correctLetters[i].toLowerCase()
+                            ? 'correct'
+                            : 'incorrect';
+                          return (
+                            <span
+                              key={`user-${i}`}
+                              className={`letter-box ${char ? feedback : 'empty'}`}
+                            >
+                              {char || '_'}
+                            </span>
+                          );
+                        })}
+                      </div>
+
+                      {/* Correct spelling row (if user was incorrect) */}
+                      {correct === false && (
+                        <div className="letter-row correct-row">
+                          {Array.from({ length: maxLen }).map((_, i) => (
+                            <span
+                              key={`correct-${i}`}
+                              className="letter-box correct"
+                            >
+                              {correctLetters[i] || ''}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             )}
-
-
-
-
             {correct === true && <p className="correct">✅ Correct!</p>}
             {correct === false && <p className="incorrect">❌ Incorrect.</p>}
-
             {showNext && (
               <button className="next" onClick={handleNext}>
                 Next Word
