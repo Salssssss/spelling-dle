@@ -39,7 +39,7 @@ const saveUsedWords = (newWords) => {
   const current = getUsedWords();
 
   const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - 30);
+  cutoff.setDate(cutoff.getDate() - 60);
 
   const recent = current.filter(entry => {
     const usedDate = new Date(entry.usedOn);
