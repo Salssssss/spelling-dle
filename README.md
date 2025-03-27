@@ -3,7 +3,6 @@
 A daily online spelling challenge 
 Spell 10 words of increasing difficulty, hear them read aloud, and share your score. Built with **React**, **Vite**, and **Text-to-Speech (TTS)**.
 
-![screenshot](public/preview.png) <!-- Optional: add a screenshot to public folder -->
 
 ---
 
