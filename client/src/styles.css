@@ -200,12 +200,12 @@ body {
   }
   
   .letter-box.correct {
-    background-color: #a4f3a4;
+    background-color: #4caf50;
     border-color: #4caf50;
   }
   
   .letter-box.incorrect {
-    background-color: #f7a7a7;
+    background-color: #d32f2f;
     border-color: #d32f2f;
   }
   
