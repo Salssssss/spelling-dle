@@ -75,7 +75,7 @@ const App = () => {
         setResults(Array(data.length).fill(null));
 
         // Check if player already played today
-        const saved = JSON.parse(localStorage.getItem('spellingdleResults'));
+        const saved = JSON.parse(localStorage.getItem('spellingGameResults'));
         if (saved?.date === today) {
           setResults(saved.results);
           setIndex(data.length); // jump to results
