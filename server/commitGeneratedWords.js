@@ -25,7 +25,8 @@ async function run() {
 
   // Step 1: Generate today's words
   console.log('📦 Running generateDailyWords...');
-  await import('./generateDailyWords.js');
+  const { generateWords } = await import('./generateDailyWords.js');
+  await generateWords();
 
   // Step 2: Check if file was created
   if (!fs.existsSync(filepath)) {

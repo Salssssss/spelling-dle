@@ -71,7 +71,7 @@ function extractJsonArray(text) {
 }
 
 
-async function generateWords() {
+export async function generateWords() {
   try {
     const usedWords = getUsedWords();
     const today = getTodayDateString();
@@ -182,6 +182,8 @@ if (fs.existsSync(yesterdayPath)) {
     console.error("❌ Error:", err.message);
   }
 }
+// Add this to allow the script to run directly OR be imported
+if (process.argv[1] === new URL(import.meta.url).pathname) {
+  generateWords();
+}
 
-
-generateWords();
