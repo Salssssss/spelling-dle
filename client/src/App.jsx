@@ -17,6 +17,8 @@ const App = () => {
   const [letterResults, setLetterResults] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState(null);
   const [alternateVoice, setAlternateVoice] = useState(null);
+  const [showNext, setShowNext] = useState(false);
+
 
 
   const inputRef = useRef(null);
@@ -124,7 +126,7 @@ const App = () => {
     setResults(updatedResults);
     setCorrect(isCorrect);
   
-    // Letter-by-letter comparison
+    // Letter-by-letter feedback
     const word = currentWord.word;
     const feedback = word.split('').map((char, i) => {
       const userChar = input[i] || '';
@@ -132,21 +134,26 @@ const App = () => {
     });
     setLetterResults(feedback);
   
-    // After short delay, go to next word
-    setTimeout(() => {
-      setLetterResults([]);
-      setInput('');
-      setIndex(index + 1);
-  
-      if (index + 1 === wordList.length) {
-        const today = getTodayDateString();
-        localStorage.setItem('spellingGameResults', JSON.stringify({
-          date: today,
-          results: updatedResults
-        }));
-      }
-    }, 2000); // 2s delay
+    setShowNext(true); // Wait for user to continue
   };
+
+  const handleNext = () => {
+    setLetterResults([]);
+    setInput('');
+    setIndex(index + 1);
+    setCorrect(null);
+    setShowNext(false);
+  
+    if (index + 1 === wordList.length) {
+      const today = getTodayDateString();
+      localStorage.setItem('spellingGameResults', JSON.stringify({
+        date: today,
+        results: [...results]
+      }));
+    }
+  };
+  
+  
   
 
   if (isLoading) {
@@ -193,10 +200,13 @@ const App = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSubmit();
-              }}
+                if (e.key === 'Enter') {
+                  showNext ? handleNext() : handleSubmit();
+                }
+              }}              
               placeholder="Type your spelling..."
               ref={inputRef}
+              spellCheck={false}
             />
             <div className="button-group">
               <button className="submit" onClick={handleSubmit}>Submit</button>
@@ -208,21 +218,44 @@ const App = () => {
               setSelectedVoice={setSelectedVoice}
             />
             {letterResults.length > 0 && (
-              <div className="letter-feedback">
-                {currentWord.word.split('').map((char, i) => (
-                  <span
-                    key={i}
-                    className={`letter-box ${letterResults[i]}`}
-                  >
-                    {input[i] || '_'}
-                  </span>
-                ))}
+              <div className="letter-feedback-rows">
+                <div className="letter-row">
+                  {currentWord.word.split('').map((char, i) => (
+                    <span
+                      key={`user-${i}`}
+                      className={`letter-box ${letterResults[i]}`}
+                    >
+                      {input[i] || '_'}
+                    </span>
+                  ))}
+                </div>
+
+                {correct === false && (
+                  <div className="letter-row correct-row">
+                    {currentWord.word.split('').map((char, i) => (
+                      <span
+                        key={`correct-${i}`}
+                        className="letter-box correct"
+                      >
+                        {char}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
 
+
+
             {correct === true && <p className="correct">✅ Correct!</p>}
             {correct === false && <p className="incorrect">❌ Incorrect.</p>}
+
+            {showNext && (
+              <button className="next" onClick={handleNext}>
+                Next Word
+              </button>
+            )}
           </>
         ) : (
           <div className="complete">

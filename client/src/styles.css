@@ -162,4 +162,53 @@ body {
   .audio:hover {
     background-color: #0056b3;
   }
+  .correction {
+    margin-top: 0.5rem;
+    font-style: italic;
+    color: #666;
+  }
   
+  button.next {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+  }
+  .letter-feedback-rows {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px; /* Increased spacing between rows */
+    margin: 1rem 0;
+  }
+  
+  .letter-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px; /* Slightly wider spacing between letters */
+  }
+  
+  .letter-box {
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    font-size: 1.25rem;
+    border-radius: 6px;
+    border: 2px solid #ccc;
+    background: #f3f3f3;
+    text-transform: uppercase;
+    min-width: 2rem;
+    text-align: center;
+  }
+  
+  .letter-box.correct {
+    background-color: #a4f3a4;
+    border-color: #4caf50;
+  }
+  
+  .letter-box.incorrect {
+    background-color: #f7a7a7;
+    border-color: #d32f2f;
+  }
+  
+  .letter-row.correct-row {
+    opacity: 0.85;
+  }
