@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import './styles.css';
 import ProgressBar from './components/ProgressBar';
 import SentenceSpeaker from './components/SentenceSpeaker';
+import VoiceSelector from './components/VoiceSelector';
 
 
 const App = () => {
@@ -28,39 +29,32 @@ const App = () => {
   
   useEffect(() => {
     const loadVoices = () => {
-      const pickVoices = () => {
+      const tryLoad = () => {
         const allVoices = speechSynthesis.getVoices();
+        if (allVoices.length > 0) {
+          setVoices(allVoices);
   
-        const mark = allVoices.find(v => v.name.toLowerCase().includes('mark'));
-        const female = allVoices.find(v => {
-          const name = v.name.toLowerCase();
-          return (
-            name.includes('female') ||
-            name.includes('samantha') ||
-            name.includes('zira') ||
-            name.includes('google uk english female') ||
-            name.includes('google us english female')
-          );
-        });
+          // Fallbacks if no voices are pre-selected
+          if (!selectedVoice) {
+            const mark = allVoices.find(v => v.name.toLowerCase().includes('mark'));
+            setSelectedVoice(mark || allVoices[0]);
+          }
   
-        const fallback = allVoices[0];
-  
-        setSelectedVoice(mark || fallback);
-        setAlternateVoice(female && female.name !== mark?.name ? female : fallback);
-  
-        console.log("🔤 Word voice:", mark?.name || fallback?.name);
-        console.log("🗣️ Sentence voice:", female?.name || fallback?.name);
+          if (!alternateVoice) {
+            const female = allVoices.find(v => v.name.toLowerCase().includes('female'));
+            setAlternateVoice(female || allVoices[0]);
+          }
+        }
       };
   
-      if (speechSynthesis.getVoices().length > 0) {
-        pickVoices();
-      } else {
-        speechSynthesis.onvoiceschanged = pickVoices;
-      }
+      // Always listen to voiceschanged, even if voices already exist
+      speechSynthesis.onvoiceschanged = tryLoad;
+      tryLoad();
     };
   
     loadVoices();
   }, []);
+  
   
   
 
@@ -208,6 +202,11 @@ const App = () => {
               <button className="submit" onClick={handleSubmit}>Submit</button>
               <button className="audio" onClick={() => speak(currentWord.word)}>🔊 Hear Word</button>
             </div>
+            <VoiceSelector
+              voices={voices}
+              selectedVoice={selectedVoice}
+              setSelectedVoice={setSelectedVoice}
+            />
             {letterResults.length > 0 && (
               <div className="letter-feedback">
                 {currentWord.word.split('').map((char, i) => (
