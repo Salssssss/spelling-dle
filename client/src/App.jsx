@@ -153,7 +153,7 @@ const App = () => {
     }
   };
   
-  
+
   
 
   if (isLoading) {
@@ -207,6 +207,9 @@ const App = () => {
                   placeholder="Type your spelling..."
                   ref={inputRef}
                   spellCheck={false}
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  autoCorrect="off"
                 />
 
                 <div className="button-group">
@@ -285,6 +288,21 @@ const App = () => {
 
         <ProgressBar results={results} currentIndex={index} />
       </div>
+      <a
+        href="https://github.com/Salssssss/spelling-dle"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          textDecoration: 'none',
+          color: '#555',
+          fontSize: '30px'
+        }}
+      >
+        GitHub ↗
+      </a>
     </div>
   );
 };
