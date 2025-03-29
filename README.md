@@ -26,34 +26,32 @@ Spell 10 words of increasing difficulty, hear them read aloud, and share your sc
 - **Domain:** GoDaddy
 - **TTS:** Web Speech API (`SpeechSynthesisUtterance`)
 
----
+```
 Project Structure
 
 spelling-dle/
-│
-├── client/                         # React frontend (Vite)
+├── client/                     # React frontend (Vite)
 │   ├── public/
-│   │   ├── words/                  # Daily word lists (e.g., 2024-03-27.json)
-│   │   └── preview.png             # Social share image (optional)
+│   │   ├── words/              # Daily word lists (e.g., 2024-03-27.json)
+│   │   └── preview.png         # Social share image (optional)
 │   ├── src/
-│   │   ├── components/             # Reusable components
+│   │   ├── components/         # Reusable components
 │   │   │   ├── ProgressBar.jsx
 │   │   │   └── SentenceSpeaker.jsx
-│   │   ├── App.jsx                 # Main game logic
-│   │   └── styles.css              # App styling
-│   ├── index.html                  # Meta tags, title, TTS-ready
-│   ├── main.jsx                    # React app entry point
-│   └── vite.config.js              # Vite configuration
-│
-├── server/                         # Word generation backend (cron job)
-│   ├── generateDailyWords.js       # OpenAI-powered script
-│   ├── usedWords.json              # Tracks last 30 days of used words
-│   └── .env                        # Contains OPENAI_API_KEY (not committed)
-│
-├── .gitignore                      # Ignores .env, node_modules, etc.
-├── README.md                       # Project documentation
-├── package.json                    # Root Node deps (optional)
-└── render.yaml                     # (optional) Render deploy config
+│   │   ├── App.jsx             # Main game logic
+│   │   ├── styles.css          # App styling
+│   │   └── main.jsx            # React app entry point
+│   └── vite.config.js          # Vite configuration
+├── server/                     # Word generation backend (cron job)
+│   ├── generateDailyWords.js   # OpenAI-powered script
+│   ├── commitGeneratedWords.js # Git commit + push script
+│   └── usedWords.json          # Tracks last 30 days of used words
+├── .env                        # Contains OPENAI_API_KEY (not committed)
+├── .gitignore                  # Ignores .env, node_modules, etc.
+├── README.md                   # Project documentation
+├── package.json                # Root Node deps (optional)
+└── render.yaml                 # (Optional) Render deploy config
+```
 
 ## ⚙️ Local Setup
 
@@ -67,9 +65,9 @@ cd client
 npm install
 npm run dev
 ```
-```
+
 Word generation requires OPENAI API key.
-```
+
 ☁️ Deployment (Render)
 Frontend: Deployed as a Static Site in /client
 
