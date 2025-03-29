@@ -179,7 +179,7 @@ const App = () => {
   return (
     <div className="app-wrapper">
       <div className="game-container">
-        <h1>Spelling-dle</h1>
+        <h1>🤠 Spelling-dle</h1>
 
         {index < wordList.length && (
           <p>Word {index + 1} of {wordList.length}</p>
