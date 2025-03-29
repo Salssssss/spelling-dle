@@ -80,7 +80,7 @@ export async function generateWords() {
     const initialPrompt = `
 Generate a list of 15 English words, increasing in spelling difficulty from easy to hard.
 Ramp up difficulty fast but stay around a medium to hard level for a few before going very hard for the last few.
-Use more obscure words for the hardest levels.
+Use more obscure words for the hardest levels. Lets do a western theme.
 For each word, provide:
 - the word itself
 - a brief definition
@@ -121,7 +121,7 @@ Return ONLY a JSON array like this:
 The following words have already been used recently in a spelling game and must be replaced:
 ${conflictList}
 
-Please return a new JSON array of ${conflicts.length} brand new English words with increasing difficulty (roughly), along with short definitions.
+Please return a new JSON array of ${conflicts.length} brand new English words with a western theme with increasing difficulty (roughly), along with short definitions.
 Format:
 [
 { "word": "newword", "definition": "...", "sentence": "..." },
