@@ -45,7 +45,7 @@ spelling-dle/
 ├── server/                     # Word generation backend (cron job)
 │   ├── generateDailyWords.js   # OpenAI-powered script
 │   ├── commitGeneratedWords.js # Git commit + push script
-│   └── usedWords.json          # Tracks last 30 days of used words
+│   └── usedWords.json          # Tracks last 60 days of used words
 ├── .env                        # Contains OPENAI_API_KEY (not committed)
 ├── .gitignore                  # Ignores .env, node_modules, etc.
 ├── README.md                   # Project documentation
