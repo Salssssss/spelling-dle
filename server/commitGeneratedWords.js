@@ -37,6 +37,7 @@ async function run() {
   // Step 3: Git commit + push
   runCommand(`git config user.name "${process.env.GIT_AUTHOR_NAME}"`);
   runCommand(`git config user.email "${process.env.GIT_AUTHOR_EMAIL}"`);
+  runCommand('git checkout main');
   runCommand(`git add -A ${filepath} ${path.join(__dirname, 'usedWords.json')}`);
   runCommand(`git commit -m "📅 Add daily word list for ${dateStr}"`);
   runCommand(`git push https://${process.env.GH_PAT}@github.com/${process.env.GH_REPO}.git main`);
