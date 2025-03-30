@@ -4,186 +4,117 @@ import ProgressBar from './components/ProgressBar';
 import SentenceSpeaker from './components/SentenceSpeaker';
 import VoiceSelector from './components/VoiceSelector';
 
-
 const App = () => {
   const [wordList, setWordList] = useState([]);
   const [results, setResults] = useState([]);
   const [index, setIndex] = useState(0);
   const [input, setInput] = useState('');
   const [correct, setCorrect] = useState(null);
-  const [voices, setVoices] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [alreadyPlayed, setAlreadyPlayed] = useState(false);
   const [letterResults, setLetterResults] = useState([]);
+  const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState(null);
   const [alternateVoice, setAlternateVoice] = useState(null);
+  const [alreadyPlayed, setAlreadyPlayed] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [showNext, setShowNext] = useState(false);
-
-
-
   const inputRef = useRef(null);
 
-  const currentWord = wordList.length > 0 ? wordList[index] : null;
+  const currentWord = wordList[index];
   const score = results.filter(r => r === 'correct').length;
+  const today = new Date(Date.now()).toISOString().split('T')[0]; 
 
-  const getTodayDateString = () => new Date().toISOString().split('T')[0];
-
-  
   useEffect(() => {
     const loadVoices = () => {
-      const tryLoad = () => {
-        const allVoices = speechSynthesis.getVoices();
-        if (allVoices.length > 0) {
-          setVoices(allVoices);
-  
-          // Fallbacks if no voices are pre-selected
-          if (!selectedVoice) {
-            const mark = allVoices.find(v => v.name.toLowerCase().includes('mark'));
-            setSelectedVoice(mark || allVoices[0]);
-          }
-  
-          if (!alternateVoice) {
-            const female = allVoices.find(v => v.name.toLowerCase().includes('female'));
-            setAlternateVoice(female || allVoices[0]);
-          }
-        }
+      const updateVoices = () => {
+        const all = speechSynthesis.getVoices();
+        setVoices(all);
+        if (!selectedVoice) setSelectedVoice(all.find(v => v.name.toLowerCase().includes('mark')) || all[0]);
+        if (!alternateVoice) setAlternateVoice(all.find(v => v.name.toLowerCase().includes('female')) || all[0]);
       };
-  
-      // Always listen to voiceschanged, even if voices already exist
-      speechSynthesis.onvoiceschanged = tryLoad;
-      tryLoad();
+      speechSynthesis.onvoiceschanged = updateVoices;
+      updateVoices();
     };
-  
     loadVoices();
   }, []);
-  
-  
-  
 
   useEffect(() => {
     const fetchWords = async () => {
-      const today = getTodayDateString();
       try {
-        const response = await fetch(`/words/${today}.json`);
-        if (!response.ok) throw new Error("Word list not found");
-        const data = await response.json();
+        const res = await fetch(`/words/${today}.json`);
+        if (!res.ok) throw new Error("Word list not found");
+        const data = await res.json();
         setWordList(data);
         setResults(Array(data.length).fill(null));
 
-        // Check if player already played today
         const saved = JSON.parse(localStorage.getItem('spellingGameResults'));
         if (saved?.date === today) {
           setResults(saved.results);
-          setIndex(data.length); // jump to results
+          setIndex(data.length);
           setAlreadyPlayed(true);
         }
-      } catch (err) {
-        console.error("❌ Failed to load word list:", err.message);
+      } catch (e) {
+        console.error("❌ Failed to load words:", e);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchWords();
-  }, []);
+  }, [today]);
 
   useEffect(() => {
     if (currentWord) speak(currentWord.word);
-    if (inputRef.current) inputRef.current.focus();
+    inputRef.current?.focus();
   }, [index]);
 
   const speak = (text) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    if (selectedVoice) utterance.voice = selectedVoice;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.voice = selectedVoice;
     speechSynthesis.cancel();
-    speechSynthesis.speak(utterance);
-  };
-
-  const getShareMessage = () => {
-    const emojiBoxes = results.map(r => {
-      if (r === 'correct') return '🟩';
-      if (r === 'incorrect') return '🟥';
-      return '⬜';
-    }).join('');
-    return `Spellingdle Score: ${score}/${wordList.length}\n${emojiBoxes}`;
-  };
-
-  const handleShare = async () => {
-    try {
-      const message = getShareMessage();
-      await navigator.clipboard.writeText(message);
-      alert("Score copied to clipboard!");
-    } catch (err) {
-      console.error("Failed to copy: ", err);
-      alert("Copy failed. Try manually.");
-    }
+    speechSynthesis.speak(utter);
   };
 
   const handleSubmit = () => {
     const isCorrect = input.toLowerCase() === currentWord.word.toLowerCase();
-    const updatedResults = [...results];
-    updatedResults[index] = isCorrect ? 'correct' : 'incorrect';
-    setResults(updatedResults);
+    const updated = [...results];
+    updated[index] = isCorrect ? 'correct' : 'incorrect';
+    setResults(updated);
     setCorrect(isCorrect);
-  
-    // Letter-by-letter feedback
-    const word = currentWord.word;
-    const feedback = word.split('').map((char, i) => {
-      const userChar = input[i] || '';
-      return userChar.toLowerCase() === char.toLowerCase() ? 'correct' : 'incorrect';
-    });
+    setShowNext(true);
+
+    const feedback = currentWord.word.split('').map((char, i) =>
+      (input[i]?.toLowerCase() === char.toLowerCase() ? 'correct' : 'incorrect')
+    );
     setLetterResults(feedback);
-  
-    setShowNext(true); // Wait for user to continue
   };
 
   const handleNext = () => {
-    setLetterResults([]);
-    setInput('');
     setIndex(index + 1);
+    setInput('');
     setCorrect(null);
+    setLetterResults([]);
     setShowNext(false);
-  
     if (index + 1 === wordList.length) {
-      const today = getTodayDateString();
-      localStorage.setItem('spellingGameResults', JSON.stringify({
-        date: today,
-        results: [...results]
-      }));
+      localStorage.setItem('spellingGameResults', JSON.stringify({ date: today, results }));
     }
   };
-  
 
-  
+  const renderLetterRow = (letters, feedback = []) =>
+    <div className="letter-row">
+      {Array.from({ length: Math.max(letters.length, feedback.length) }).map((_, i) => (
+        <span key={i} className={`letter-box ${feedback[i] || ''}`}>
+          {letters[i] || '_'}
+        </span>
+      ))}
+    </div>;
 
-  if (isLoading) {
-    return (
-      <div className="app-wrapper">
-        <div className="game-container">
-          <p>Loading today's word list...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (wordList.length === 0) {
-    return (
-      <div className="app-wrapper">
-        <div className="game-container">
-          <p>No word list found for today. Check back later!</p>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <div className="game-container"><p>Loading...</p></div>;
+  if (!wordList.length) return <div className="game-container"><p>No words found for today.</p></div>;
 
   return (
     <div className="app-wrapper">
       <div className="game-container">
         <h1>Spelling-dle</h1>
-
-        {index < wordList.length && (
-          <p>Word {index + 1} of {wordList.length}</p>
-        )}
+        {index < wordList.length && <p>Word {index + 1} of {wordList.length}</p>}
 
         {currentWord ? (
           <>
@@ -196,27 +127,22 @@ const App = () => {
                   primaryVoice={selectedVoice}
                   alternateVoice={alternateVoice}
                 />
-
                 <input
                   className="text-input"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSubmit();
-                  }}
-                  placeholder="Type your spelling..."
                   ref={inputRef}
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+                  placeholder="Type your spelling..."
                   spellCheck={false}
                   autoComplete="off"
                   autoCapitalize="none"
                   autoCorrect="off"
                 />
-
                 <div className="button-group">
                   <button className="submit" onClick={handleSubmit}>Submit</button>
                   <button className="audio" onClick={() => speak(currentWord.word)}>🔊 Hear Word</button>
                 </div>
-
                 <VoiceSelector
                   voices={voices}
                   selectedVoice={selectedVoice}
@@ -226,55 +152,17 @@ const App = () => {
             )}
             {letterResults.length > 0 && (
               <div className="letter-feedback-rows">
-                {(() => {
-                  const correctLetters = currentWord.word.split('');
-                  const userLetters = input.split('');
-                  const maxLen = Math.max(correctLetters.length, userLetters.length);
-
-                  return (
-                    <>
-                      {/* User's answer row */}
-                      <div className="letter-row">
-                        {Array.from({ length: maxLen }).map((_, i) => {
-                          const char = userLetters[i] || '';
-                          const feedback = correctLetters[i] && char.toLowerCase() === correctLetters[i].toLowerCase()
-                            ? 'correct'
-                            : 'incorrect';
-                          return (
-                            <span
-                              key={`user-${i}`}
-                              className={`letter-box ${char ? feedback : 'empty'}`}
-                            >
-                              {char || '_'}
-                            </span>
-                          );
-                        })}
-                      </div>
-
-                      {/* Correct spelling row (if user was incorrect) */}
-                      {correct === false && (
-                        <div className="letter-row correct-row">
-                          {Array.from({ length: maxLen }).map((_, i) => (
-                            <span
-                              key={`correct-${i}`}
-                              className="letter-box correct"
-                            >
-                              {correctLetters[i] || ''}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  );
-                })()}
+                {renderLetterRow(input.split(''), letterResults)}
+                {correct === false && renderLetterRow(currentWord.word.split(''), Array(currentWord.word.length).fill('correct'))}
               </div>
             )}
-            {correct === true && <p className="correct">✅ Correct!</p>}
-            {correct === false && <p className="incorrect">❌ Incorrect.</p>}
-            {showNext && (
-              <button className="next" onClick={handleNext}>
-                Next Word
-              </button>
+            {correct !== null && (
+              <>
+                <p className={correct ? "correct" : "incorrect"}>
+                  {correct ? '✅ Correct!' : '❌ Incorrect.'}
+                </p>
+                {showNext && <button className="next" onClick={handleNext}>Next Word</button>}
+              </>
             )}
           </>
         ) : (
@@ -282,12 +170,19 @@ const App = () => {
             <h2>🎉 Game Over!</h2>
             <p>Your Score: <strong>{score}</strong> / {wordList.length}</p>
             {alreadyPlayed && <p>You already played today's game.</p>}
-            <button className="submit" onClick={handleShare}>📋 Share Score</button>
+            <button className="submit" onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(`Spellingdle Score: ${score}/${wordList.length}`);
+                alert("Copied to clipboard!");
+              } catch {
+                alert("Copy failed.");
+              }
+            }}>📋 Share Score</button>
           </div>
         )}
-
         <ProgressBar results={results} currentIndex={index} />
       </div>
+
       <a
         href="https://github.com/Salssssss/spelling-dle"
         target="_blank"

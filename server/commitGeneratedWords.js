@@ -36,7 +36,7 @@ async function run() {
 
   // Step 3: Git commit + push
   runCommand('git pull');
-  runCommand(`git add ${filepath} ${path.join(__dirname, 'usedWords.json')}`);
+  runCommand(`git add -A ${filepath} ${path.join(__dirname, 'usedWords.json')}`);
   runCommand(`git commit -m "📅 Add daily word list for ${dateStr}"`);
   runCommand(`git push https://${process.env.GH_PAT}@github.com/${process.env.GH_REPO}.git main`);
 }
