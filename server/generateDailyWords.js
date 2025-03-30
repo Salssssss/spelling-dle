@@ -39,7 +39,7 @@ const saveUsedWords = (newWords) => {
   const current = getUsedWords();
 
   const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - 60);
+  cutoff.setDate(cutoff.getDate() - 30);
 
   const recent = current.filter(entry => {
     const usedDate = new Date(entry.usedOn);
@@ -112,7 +112,7 @@ Return ONLY a JSON array like this:
 
  // STEP 3–4: Retry loop until we have at least 10 fresh words
  let attempt = 0;
- const maxAttempts = 3;
+ const maxAttempts = 5;
 
  while (freshWords.length < 10 && conflicts.length > 0 && attempt < maxAttempts) {
    attempt++;
