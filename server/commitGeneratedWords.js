@@ -19,12 +19,14 @@ const runCommand = (cmd) => {
   execSync(cmd, { stdio: 'inherit', cwd: ROOT });
 };
 
-// connect to repo
+// add a remote
+runCommand(`git remote add origin ${gitRemoteUrl}`);
+// configure and pull
 runCommand(`git config user.name "${process.env.GIT_AUTHOR_NAME}"`);
 runCommand(`git config user.email "${process.env.GIT_AUTHOR_EMAIL}"`);
 runCommand(`git remote set-url origin ${gitRemoteUrl}`);
 runCommand('git checkout main');
-runCommand(`git pull ${gitRemoteUrl} main --rebase`);
+runCommand(`git pull origin main --rebase`);
 
 const getTodayDateString = () => new Date().toISOString().split('T')[0];
 
