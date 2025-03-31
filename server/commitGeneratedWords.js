@@ -21,7 +21,7 @@ const runCommand = (cmd) => {
 runCommand(`git config user.name "${process.env.GIT_AUTHOR_NAME}"`);
 runCommand(`git config user.email "${process.env.GIT_AUTHOR_EMAIL}"`);
 runCommand('git checkout main');
-runCommand('git pull origin main --rebase');
+runCommand('git pull main --rebase');
 
 const getTodayDateString = () => new Date().toISOString().split('T')[0];
 
