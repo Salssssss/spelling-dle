@@ -11,6 +11,8 @@ dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const WORDS_DIR = path.join(ROOT, 'client', 'public', 'words');
+const gitRemoteUrl = `https://${process.env.GH_PAT}@github.com/${process.env.GH_REPO}.git`;
+
 
 const runCommand = (cmd) => {
   console.log(`> ${cmd}`);
@@ -20,8 +22,9 @@ const runCommand = (cmd) => {
 // connect to repo
 runCommand(`git config user.name "${process.env.GIT_AUTHOR_NAME}"`);
 runCommand(`git config user.email "${process.env.GIT_AUTHOR_EMAIL}"`);
+runCommand(`git remote set-url origin ${gitRemoteUrl}`);
 runCommand('git checkout main');
-runCommand('git pull main --rebase');
+runCommand(`git pull ${gitRemoteUrl} main --rebase`);
 
 const getTodayDateString = () => new Date().toISOString().split('T')[0];
 
@@ -44,7 +47,7 @@ async function run() {
   // Step 3: Git commit + push
   runCommand(`git add -A ${filepath} ${path.join(__dirname, 'usedWords.json')}`);
   runCommand(`git commit -m "📅 Add daily word list for ${dateStr}"`);
-  runCommand(`git push https://${process.env.GH_PAT}@github.com/${process.env.GH_REPO}.git main`);
+  runCommand(`git push ${gitRemoteUrl} main`);
 }
 
 run().catch(err => {
