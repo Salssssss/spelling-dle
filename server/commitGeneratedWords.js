@@ -6,11 +6,7 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 
 dotenv.config();
-// connect to repo
-runCommand(`git config user.name "${process.env.GIT_AUTHOR_NAME}"`);
-runCommand(`git config user.email "${process.env.GIT_AUTHOR_EMAIL}"`);
-runCommand('git checkout main');
-runCommand('git pull origin main --rebase');
+
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -20,6 +16,12 @@ const runCommand = (cmd) => {
   console.log(`> ${cmd}`);
   execSync(cmd, { stdio: 'inherit', cwd: ROOT });
 };
+
+// connect to repo
+runCommand(`git config user.name "${process.env.GIT_AUTHOR_NAME}"`);
+runCommand(`git config user.email "${process.env.GIT_AUTHOR_EMAIL}"`);
+runCommand('git checkout main');
+runCommand('git pull origin main --rebase');
 
 const getTodayDateString = () => new Date().toISOString().split('T')[0];
 
