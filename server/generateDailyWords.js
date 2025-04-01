@@ -85,11 +85,13 @@ For each word, provide:
 - the word itself
 - a brief definition
 - a sentence using the word
-Return ONLY a JSON array like this:
+Return ONLY a valid JSON array like this:
 [
   { "word": "cat", "definition": "a small domesticated carnivorous mammal", "sentence": "My cat loves the scratching post." },
   ...
 ]
+DO NOT format with markdown or comments.
+DO NOT include explanations or code blocks.
 `;
 
     const initialResponse = await openai.chat.completions.create({
@@ -122,13 +124,15 @@ Return ONLY a JSON array like this:
 The following words have already been used recently in a spelling game and must be replaced:
 ${conflictList}
 
-Please return a new JSON array of ${conflicts.length} brand new English spelling bee words with increasing difficulty (roughly), along with short definitions and sentences.
+Please return a new valid JSON array of ${conflicts.length} brand new English spelling bee words with increasing difficulty (roughly), along with short definitions and sentences.
 Avoid short words and try and make the words uncomon.
 Format:
 [
 { "word": "newword", "definition": "...", "sentence": "..." },
 ...
 ]
+DO NOT format with markdown or comments.
+DO NOT include explanations or code blocks.
 `;
 
    const fixResponse = await openai.chat.completions.create({
