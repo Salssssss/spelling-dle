@@ -172,12 +172,21 @@ const App = () => {
             {alreadyPlayed && <p>You already played today's game.</p>}
             <button className="submit" onClick={async () => {
               try {
-                await navigator.clipboard.writeText(`Spellingdle Score: ${score}/${wordList.length}`);
+                const emojiBoxes = results.map(r => {
+                  if (r === 'correct') return '🟩';
+                  if (r === 'incorrect') return '🟥';
+                  return '⬜';
+                }).join('');
+                const message = `Spellingdle Score: ${score}/${wordList.length}\n${emojiBoxes}`;
+                
+                await navigator.clipboard.writeText(message);
                 alert("Copied to clipboard!");
               } catch {
                 alert("Copy failed.");
               }
-            }}>📋 Share Score</button>
+            }}>
+              📋 Share Score
+            </button>
           </div>
         )}
         <ProgressBar results={results} currentIndex={index} />
