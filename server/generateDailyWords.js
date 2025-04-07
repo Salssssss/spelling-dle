@@ -78,7 +78,7 @@ export async function generateWords() {
 
     // STEP 1: Generate initial candidates
     const initialPrompt = `
-Generate a list of 15 English words, increasing in spelling difficulty from easy to hard.
+Generate a list of 20 English words, increasing in spelling difficulty from easy to hard.
 Ramp up difficulty fast but stay around a medium to hard level for a few before going very hard for the last few.
 Use more obscure words for the hardest levels. Avoid short words.
 For each word, provide:
@@ -90,8 +90,7 @@ Return ONLY a valid JSON array like this:
   { "word": "cat", "definition": "a small domesticated carnivorous mammal", "sentence": "My cat loves the scratching post." },
   ...
 ]
-DO NOT format with markdown or comments.
-DO NOT include explanations or code blocks.
+Follow the format precisely and do not include any other text or explanations.
 `;
 
     const initialResponse = await openai.chat.completions.create({
@@ -114,7 +113,7 @@ DO NOT include explanations or code blocks.
 
  // STEP 3–4: Retry loop until we have at least 10 fresh words
  let attempt = 0;
- const maxAttempts = 5;
+ const maxAttempts = 10;
 
  while (freshWords.length < 10 && conflicts.length > 0 && attempt < maxAttempts) {
    attempt++;
@@ -124,15 +123,14 @@ DO NOT include explanations or code blocks.
 The following words have already been used recently in a spelling game and must be replaced:
 ${conflictList}
 
-Please return a new valid JSON array of ${conflicts.length} brand new English spelling bee words with increasing difficulty (roughly), along with short definitions and sentences.
-Avoid short words and try and make the words uncomon.
+Please return a new valid JSON array of ${conflicts.length} English spelling bee words, along with short definitions and sentences.
+Avoid short words and use words that are uncommon and not too easy.
 Format:
 [
 { "word": "newword", "definition": "...", "sentence": "..." },
 ...
 ]
-DO NOT format with markdown or comments.
-DO NOT include explanations or code blocks.
+Follow the format precisely and do not include any other text or explanations.
 `;
 
    const fixResponse = await openai.chat.completions.create({
