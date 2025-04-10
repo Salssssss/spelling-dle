@@ -39,7 +39,7 @@ const saveUsedWords = (newWords) => {
   const current = getUsedWords();
 
   const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - 30);
+  cutoff.setDate(cutoff.getDate() - 30 ); // 5 days ago
 
   const recent = current.filter(entry => {
     const usedDate = new Date(entry.usedOn);
@@ -78,7 +78,7 @@ export async function generateWords() {
 
     // STEP 1: Generate initial candidates
     const initialPrompt = `
-Generate a list of 20 English words, increasing in spelling difficulty from easy to hard.
+Generate a list of 50 English spelling bee words.
 Ramp up difficulty fast but stay around a medium to hard level for a few before going very hard for the last few.
 Use more obscure words for the hardest levels. Avoid short words.
 For each word, provide:
